@@ -21,7 +21,7 @@ type Page struct {
 	Body  []byte
 }
 
-// почему мы используем указатель?
+// почему мы используем указатель
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
 	return os.WriteFile(filename, p.Body, 0600) //возвращаем error потому что его возвращает этот метод
