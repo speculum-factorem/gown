@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -9,17 +10,38 @@ import (
 
 func main() {
 	http.HandleFunc("/", handler)
+	// log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/viev/", vievHandler)
+	http.HandleFunc(("/edit/"), editHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
+func renderTemplate(w http.ResponseWriter, temp string, page *Page) {
+	t, _ := template.ParseFiles(temp)
+	t.Execute(w, page)
+}
+
 func vievHandler(w http.ResponseWriter, r *http.Request) {
 	filename := r.URL.Path[len("/viev/"):]
-	page, _ := loadPage(filename)
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", page.Title, page.Body)
+	page, err := loadPage(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	renderTemplate(w, "viev", page)
+}
+
+func editHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("edit/"):]
+	page, err := loadPage(title)
+	if err == nil {
+		log.Fatal(err)
+	}
+	renderTemplate(w, "edit", page)
 }
 
 type Page struct {
