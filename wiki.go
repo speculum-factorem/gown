@@ -7,13 +7,19 @@ import (
 	"os"
 )
 
+func main() {
+	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
-func main() {
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func vievHandler(w http.ResponseWriter, r *http.Request) {
+	filename := r.URL.Path[len("/viev/"):]
+	page, _ := loadPage(filename)
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", page.Title, page.Body)
 }
 
 type Page struct {
